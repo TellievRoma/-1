@@ -29,7 +29,14 @@ class SportExercise(QWidget):
         number_podhodov_spinbox.setSingleStep(1)  # Значение спинбокса изменяется при нажатии на 1
         number_podhodov_layout.addWidget(number_podhodov_spinbox)
 
+        number_povtoreniy_layout = QVBoxLayout()
+        number_povtoreniy_lbl = QLabel("Количество повторений")
+        number_povtoreniy_layout.addWidget(number_povtoreniy_lbl)
+        number_povtoreniy_spinbox = QSpinBox()
+        number_povtoreniy_layout.addWidget(number_povtoreniy_spinbox)
+
         self.row.addLayout(number_podhodov_layout)
+        self.row.addLayout(number_povtoreniy_layout)
 
         self.setLayout(self.row)
 
