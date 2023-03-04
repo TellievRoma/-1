@@ -7,6 +7,14 @@ import sys
 # 2. Добавить в самый верх виджета Window виджет с названием тренировки (тип виджета: QLineEdit)
 # 3. добавить в виджет SportExercise колонки 'Количество повторений', 'Рабочий вес' (СДЕЛАЛ!)
 
+# Задание 2
+# 1. добавить в класс SportExercise для упражения элемент QLabel (справа от 'Рабочий вес'),
+#    который будет в будущем отображать тоннаж этого упражнения
+# 2. написать функцию, которая получает на вход 3 параметра:
+#    a. количество подходов; b. количество повторений; c. рабочий вес
+#    функция должна возвращать тоннаж, исходя из значений этих параметров
+# 3. удалить из git папки .idea и __pycache__ (воспользоваться командой: git rm --cached <file>)
+
 class TrainingName(QLineEdit):
     def __init__(self, name):
         name(QLineEdit)
@@ -59,6 +67,9 @@ class Window(QWidget):
         # главная (вертикальная) компоновка для окна
         mainlayout = QVBoxLayout()
 
+        name_of_training_lbl = QLineEdit("Тренировка 1")
+        mainlayout.addWidget(name_of_training_lbl)
+
         # Create the list
         mylist = QListWidget()
 
@@ -80,7 +91,7 @@ class Window(QWidget):
 def main():
     app = QApplication(sys.argv)
     window = Window()
-    window.resize(500, 400)
+    window.resize(700, 400)
     window.show()
     sys.exit(app.exec_())
 
