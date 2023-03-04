@@ -1,11 +1,16 @@
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QListWidget, QListWidgetItem, \
-    QHBoxLayout, QLabel,  QSpacerItem, QSizePolicy, QSpinBox
+    QHBoxLayout, QLabel,  QSpacerItem, QSizePolicy, QSpinBox, QLineEdit
 import sys
 
 # Задание:
-# 1. понять код в этом файле
+# 1. понять код в этом файле (НА СКОЛЬКО ВОЗМОЖНО ПОНЯЛ КОД)
 # 2. Добавить в самый верх виджета Window виджет с названием тренировки (тип виджета: QLineEdit)
-# 3. добавить в виджет SportExercise колонки 'Количество повторений', 'Рабочий вес'
+# 3. добавить в виджет SportExercise колонки 'Количество повторений', 'Рабочий вес' (СДЕЛАЛ!)
+
+class TrainingName(QLineEdit):
+    def __init__(self, name):
+        name(QLineEdit)
+        self.resize(350, 250)
 
 
 # Класс виджета 'спортивное упражнение'
@@ -35,8 +40,15 @@ class SportExercise(QWidget):
         number_povtoreniy_spinbox = QSpinBox()
         number_povtoreniy_layout.addWidget(number_povtoreniy_spinbox)
 
+        number_weight_layout = QVBoxLayout()
+        number_weight_lbl = QLabel("Рабочий вес")
+        number_weight_layout.addWidget(number_weight_lbl)
+        number_weight_spinbox = QSpinBox()
+        number_weight_layout.addWidget(number_weight_spinbox)
+
         self.row.addLayout(number_podhodov_layout)
         self.row.addLayout(number_povtoreniy_layout)
+        self.row.addLayout(number_weight_layout)
 
         self.setLayout(self.row)
 
@@ -71,7 +83,6 @@ def main():
     window.resize(500, 400)
     window.show()
     sys.exit(app.exec_())
-
 
 if __name__ == "__main__":
     main()
