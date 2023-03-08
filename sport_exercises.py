@@ -15,10 +15,11 @@ import sys
 #    функция должна возвращать тоннаж, исходя из значений этих параметров
 # 3. удалить из git папки .idea и __pycache__ (воспользоваться командой: git rm --cached <file>)
 
-class TrainingName(QLineEdit):
-    def __init__(self, name):
-        name(QLineEdit)
-        self.resize(350, 250)
+
+
+def calculate_tonaj(count_podhodov, robociy_ves, count_povtoreniy):
+    tonaj = (count_povtoreniy * robociy_ves) * count_podhodov
+    return tonaj
 
 
 # Класс виджета 'спортивное упражнение'
@@ -38,27 +39,48 @@ class SportExercise(QWidget):
         number_podhodov_layout = QVBoxLayout() # вертикальная компоновка
         number_podhodov_lbl = QLabel("Количество подходов")
         number_podhodov_layout.addWidget(number_podhodov_lbl)
-        number_podhodov_spinbox = QSpinBox()
-        number_podhodov_spinbox.setSingleStep(1)  # Значение спинбокса изменяется при нажатии на 1
-        number_podhodov_layout.addWidget(number_podhodov_spinbox)
+        self.number_podhodov_spinbox = QSpinBox()
+        self.number_podhodov_spinbox.setSingleStep(1)  # Значение спинбокса изменяется при нажатии на 1
+        number_podhodov_layout.addWidget(self.number_podhodov_spinbox)
 
         number_povtoreniy_layout = QVBoxLayout()
         number_povtoreniy_lbl = QLabel("Количество повторений")
         number_povtoreniy_layout.addWidget(number_povtoreniy_lbl)
-        number_povtoreniy_spinbox = QSpinBox()
-        number_povtoreniy_layout.addWidget(number_povtoreniy_spinbox)
+        self.number_povtoreniy_spinbox = QSpinBox()
+        number_povtoreniy_layout.addWidget(self.number_povtoreniy_spinbox)
 
         number_weight_layout = QVBoxLayout()
         number_weight_lbl = QLabel("Рабочий вес")
         number_weight_layout.addWidget(number_weight_lbl)
-        number_weight_spinbox = QSpinBox()
-        number_weight_layout.addWidget(number_weight_spinbox)
+        self.number_weight_spinbox = QSpinBox()
+        self.number_weight_spinbox.setMaximum(999)
+        number_weight_layout.addWidget(self.number_weight_spinbox)
+
+        tonaj_layout = QVBoxLayout()
+        tonaj_lbl = QLabel("Тоннаж")
+        tonaj_layout.addWidget(tonaj_lbl)
+        self.tonaj_value_lbl = QLabel("0")
+        tonaj_layout.addWidget(self.tonaj_value_lbl)
 
         self.row.addLayout(number_podhodov_layout)
         self.row.addLayout(number_povtoreniy_layout)
         self.row.addLayout(number_weight_layout)
+        self.row.addLayout(tonaj_layout)
+
+        self.number_podhodov_spinbox.valueChanged.connect(self.update_tonaj)
+        self.number_povtoreniy_spinbox.valueChanged.connect(self.update_tonaj)
+        self.number_weight_spinbox.valueChanged.connect(self.update_tonaj)
 
         self.setLayout(self.row)
+
+    def update_tonaj(self):
+        count_podhodov =self.number_podhodov_spinbox.value()
+        robociy_ves = self.number_weight_spinbox.value()
+        count_povtoreniy = self.number_povtoreniy_spinbox.value()
+        tonaj = calculate_tonaj(count_podhodov, robociy_ves, count_povtoreniy)
+        self.tonaj_value_lbl.setText(str(tonaj))
+
+
 
 
 class Window(QWidget):
@@ -95,5 +117,16 @@ def main():
     window.show()
     sys.exit(app.exec_())
 
+def calculate_tonaj(count_podhodov, robociy_ves, count_povtoreniy):
+    tonaj = (count_povtoreniy * robociy_ves) * count_podhodov
+    return tonaj
+
+
 if __name__ == "__main__":
+    # res = calculate_tonaj(robociy_ves=100, count_podhodov=4, count_povtoreniy=10)
+    # assert res == 4000
+    #
+    # res2 = calculate_tonaj(robociy_ves=101, count_podhodov=4, count_povtoreniy=10)
+    # assert res2 == 4040
+
     main()
