@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QListWidget, QListWidgetItem, \
-    QHBoxLayout, QLabel,  QSpacerItem, QSizePolicy, QSpinBox, QLineEdit
+    QHBoxLayout, QLabel, QSpacerItem, QSizePolicy, QSpinBox, QLineEdit
 import sys
+
 
 # Задание:
 # 1. понять код в этом файле (НА СКОЛЬКО ВОЗМОЖНО ПОНЯЛ КОД)
@@ -15,6 +16,14 @@ import sys
 #    функция должна возвращать тоннаж, исходя из значений этих параметров
 # 3. удалить из git папки .idea и __pycache__ (воспользоваться командой: git rm --cached <file>)
 
+# Задание 3
+# 1. Под списком заданий создать QHBoxLayout, который содержит 2 QLabel:
+#    - первый QLabel отображает надпись: "Общий тоннаж"
+#    - второй QLabel будет отображать суммарное значение тоннажа для всех упражнений
+# 2. Создать для класса SportExercise метод с именем get_tonaj, который возвращает тоннаж для этого упражнения
+# 3. Изучить статью по сигналам и слотам в pyqt: https://pythonworld.ru/gui/pyqt5-eventssignals.html
+# 4. Создать сигнал для класса SportExercise с названием tonaj_changed
+# 5. изучить статью про лямбда функции: https://habr.com/ru/company/piter/blog/674234/
 
 
 def calculate_tonaj(count_podhodov, robociy_ves, count_povtoreniy):
@@ -31,12 +40,13 @@ class SportExercise(QWidget):
         self.row = QHBoxLayout()
 
         nameLbl = QLabel(name)
-        self.row.addWidget(nameLbl) # добвляем виджет в компоновку
+        self.row.addWidget(nameLbl)  # добвляем виджет в компоновку
 
-        self.row.addItem(QSpacerItem(0, 0, QSizePolicy.Expanding, QSizePolicy.Expanding)) # добавляем растяжение в компоновку
+        self.row.addItem(
+            QSpacerItem(0, 0, QSizePolicy.Expanding, QSizePolicy.Expanding))  # добавляем растяжение в компоновку
 
         # Столбик количество подходов
-        number_podhodov_layout = QVBoxLayout() # вертикальная компоновка
+        number_podhodov_layout = QVBoxLayout()  # вертикальная компоновка
         number_podhodov_lbl = QLabel("Количество подходов")
         number_podhodov_layout.addWidget(number_podhodov_lbl)
         self.number_podhodov_spinbox = QSpinBox()
@@ -74,13 +84,11 @@ class SportExercise(QWidget):
         self.setLayout(self.row)
 
     def update_tonaj(self):
-        count_podhodov =self.number_podhodov_spinbox.value()
+        count_podhodov = self.number_podhodov_spinbox.value()
         robociy_ves = self.number_weight_spinbox.value()
         count_povtoreniy = self.number_povtoreniy_spinbox.value()
         tonaj = calculate_tonaj(count_podhodov, robociy_ves, count_povtoreniy)
         self.tonaj_value_lbl.setText(str(tonaj))
-
-
 
 
 class Window(QWidget):
@@ -117,16 +125,6 @@ def main():
     window.show()
     sys.exit(app.exec_())
 
-def calculate_tonaj(count_podhodov, robociy_ves, count_povtoreniy):
-    tonaj = (count_povtoreniy * robociy_ves) * count_podhodov
-    return tonaj
-
 
 if __name__ == "__main__":
-    # res = calculate_tonaj(robociy_ves=100, count_podhodov=4, count_povtoreniy=10)
-    # assert res == 4000
-    #
-    # res2 = calculate_tonaj(robociy_ves=101, count_podhodov=4, count_povtoreniy=10)
-    # assert res2 == 4040
-
     main()
