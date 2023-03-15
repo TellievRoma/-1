@@ -72,6 +72,13 @@ class SportExercise(QWidget):
         self.tonaj_value_lbl = QLabel("0")
         tonaj_layout.addWidget(self.tonaj_value_lbl)
 
+        obsiy_tonaj = QHBoxLayout()
+        button1 = QLabel("Общий тоннаж")
+        button2 = QLabel("суммарное значение тоннажа для всех упражнений")
+        obsiy_tonaj.addWidget(button1)
+        obsiy_tonaj.addWidget(button2)
+        self.setLayout(obsiy_tonaj)
+
         self.row.addLayout(number_podhodov_layout)
         self.row.addLayout(number_povtoreniy_layout)
         self.row.addLayout(number_weight_layout)
