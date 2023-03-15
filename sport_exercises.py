@@ -25,6 +25,17 @@ import sys
 # 4. Создать сигнал для класса SportExercise с названием tonaj_changed
 # 5. изучить статью про лямбда функции: https://habr.com/ru/company/piter/blog/674234/
 
+# Дополнение к заданию 3
+# 1. комментарий к коммиту лучше делать на английском языке: git commit -m 'You should use English here'
+# 2. не добавлять папки (.idea), которые не относятся к разработанным нами файлам и не
+#    будут полезны для тех, кто пользуется репозиторием
+# 3. нужно добавить .idea в .gitignore
+# 4. названия переменных (классов, функций) должны отражать их сущность:
+#    a. то есть если мы создаем объект класса QLabel -> то название button этой переменной не подходит,
+#    потому что это надпись, а не кнопка
+#    b. избегать названий для переменных типа "a", "b", "size1", "size2" -> ведь если увидишь в коде
+#       переменную с таким названием, то сразу не поймешь, для чего она нужна
+
 
 def calculate_tonaj(count_podhodov, robociy_ves, count_povtoreniy):
     tonaj = (count_povtoreniy * robociy_ves) * count_podhodov
@@ -72,13 +83,6 @@ class SportExercise(QWidget):
         self.tonaj_value_lbl = QLabel("0")
         tonaj_layout.addWidget(self.tonaj_value_lbl)
 
-        obsiy_tonaj = QHBoxLayout()
-        button1 = QLabel("Общий тоннаж")
-        button2 = QLabel("суммарное значение тоннажа для всех упражнений")
-        obsiy_tonaj.addWidget(button1)
-        obsiy_tonaj.addWidget(button2)
-        self.setLayout(obsiy_tonaj)
-
         self.row.addLayout(number_podhodov_layout)
         self.row.addLayout(number_povtoreniy_layout)
         self.row.addLayout(number_weight_layout)
@@ -107,21 +111,34 @@ class Window(QWidget):
         name_of_training_lbl = QLineEdit("Тренировка 1")
         mainlayout.addWidget(name_of_training_lbl)
 
-        # Create the list
-        mylist = QListWidget()
+        # Create the list of exercises
+        exercises_list = QListWidget()
 
         for exercise_name in ["Отжимания", "Шраги", "Поднятие штанги на бицепс"]:
             # QListWidgetItem - это как бы ячейка, в которую мы можем поместить свой виджет
-            item = QListWidgetItem(mylist)
-            mylist.addItem(item)
+            item = QListWidgetItem(exercises_list)
+            exercises_list.addItem(item)
 
             se = SportExercise(name=exercise_name)
             item.setSizeHint(se.minimumSizeHint())  # item имеет такой же размер, что и se
 
             # Привязываем виджет 'спортивное упражнение' с QListWidgetItem
-            mylist.setItemWidget(item, se)
+            exercises_list.setItemWidget(item, se)
 
-        mainlayout.addWidget(mylist)
+        # Добавляется таблица с упражнениями
+        mainlayout.addWidget(exercises_list)
+
+        # Обший тоннаж добавляется под таблицу
+        obsiy_tonaj_layout = QHBoxLayout()
+        tonaj_sum_description_lbl = QLabel("Общий тоннаж:")
+        tonaj_sum_value_lbl = QLabel("0")
+        obsiy_tonaj_layout.addWidget(tonaj_sum_description_lbl)
+        obsiy_tonaj_layout.addWidget(tonaj_sum_value_lbl)
+        obsiy_tonaj_layout.addItem(
+            QSpacerItem(0, 0, QSizePolicy.Expanding, QSizePolicy.Fixed))
+
+        mainlayout.addLayout(obsiy_tonaj_layout)
+
         self.setLayout(mainlayout)
 
 
