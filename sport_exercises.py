@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QListWidget, QListWidgetItem, \
-    QHBoxLayout, QLabel, QSpacerItem, QSizePolicy, QSpinBox, QLineEdit
+    QHBoxLayout, QLabel, QSpacerItem, QSizePolicy, QSpinBox, QLineEdit, QPushButton
+from PyQt5.QtCore import pyqtSignal
 import sys
 
 
@@ -36,8 +37,14 @@ import sys
 #    b. избегать названий для переменных типа "a", "b", "size1", "size2" -> ведь если увидишь в коде
 #       переменную с таким названием, то сразу не поймешь, для чего она нужна
 
+# Урок 4
+# 1. Создать в SportExercise колонку где будут кнопки у каждого упражнения сброса тоннажа.
+# 2. Создать метод reset для SportExercise он должен сбрасывать тоннаж в 0
 
-def calculate_tonaj(count_podhodov, robociy_ves, count_povtoreniy):
+#Урок 5
+#1. Изучить чтение и запись в файлы
+#2. Почитать про json
+def calculate_tonaj(count_podhodov:int,robociy_ves:int, count_povtoreniy:int) -> int:
     tonaj = (count_povtoreniy * robociy_ves) * count_podhodov
     return tonaj
 
@@ -49,7 +56,7 @@ class SportExercise(QWidget):
 
         # Это главная гозизонтальная компоновка
         self.row = QHBoxLayout()
-
+        self.name = name
         nameLbl = QLabel(name)
         self.row.addWidget(nameLbl)  # добвляем виджет в компоновку
 
@@ -83,10 +90,18 @@ class SportExercise(QWidget):
         self.tonaj_value_lbl = QLabel("0")
         tonaj_layout.addWidget(self.tonaj_value_lbl)
 
+        sbros_layout = QVBoxLayout()
+        self.sbros_button_lbl = QPushButton('Сброс')
+        sbros_layout.addWidget(self.sbros_button_lbl)
+
+        self.sbros_button_lbl.clicked.connect(self.reset)
+        self.tonaj_changed.connect(lambda : print(f'{self.name} : {self.get_tonaj()}'))
+
         self.row.addLayout(number_podhodov_layout)
         self.row.addLayout(number_povtoreniy_layout)
         self.row.addLayout(number_weight_layout)
         self.row.addLayout(tonaj_layout)
+        self.row.addLayout(sbros_layout)
 
         self.number_podhodov_spinbox.valueChanged.connect(self.update_tonaj)
         self.number_povtoreniy_spinbox.valueChanged.connect(self.update_tonaj)
@@ -94,17 +109,40 @@ class SportExercise(QWidget):
 
         self.setLayout(self.row)
 
+    def reset(self):
+        self.number_podhodov_spinbox.setValue(0)
+        self.number_povtoreniy_spinbox.setValue(0)
+        self.number_weight_spinbox.setValue(0)
+
+
+    def tonaj_changed_slot(self):
+        print(f'{self.name} : {self.get_tonaj()}')
+
+    tonaj_changed = pyqtSignal()
+    def get_tonaj(self) -> int :
+        tonaj = int(self.tonaj_value_lbl.text())
+        return tonaj
+
+
     def update_tonaj(self):
         count_podhodov = self.number_podhodov_spinbox.value()
         robociy_ves = self.number_weight_spinbox.value()
         count_povtoreniy = self.number_povtoreniy_spinbox.value()
         tonaj = calculate_tonaj(count_podhodov, robociy_ves, count_povtoreniy)
+        old_tonaj = self.get_tonaj()
         self.tonaj_value_lbl.setText(str(tonaj))
+        if old_tonaj != self.get_tonaj():
+            self.tonaj_changed.emit()
+
+
+        #я не до конца понял смысл "Создать для класса SportExercise метод с именем get_tonaj, который возвращает тоннаж для этого упражнения"
+        #для какого упражнения?
+        #Я понял, что мне нужно
 
 
 class Window(QWidget):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, names):
+        super().__init__() #Супер позваляет обратиться к родительскому классу
         # главная (вертикальная) компоновка для окна
         mainlayout = QVBoxLayout()
 
@@ -113,14 +151,17 @@ class Window(QWidget):
 
         # Create the list of exercises
         exercises_list = QListWidget()
-
-        for exercise_name in ["Отжимания", "Шраги", "Поднятие штанги на бицепс"]:
+        self.spisok = []
+        for exercise_name in names:
             # QListWidgetItem - это как бы ячейка, в которую мы можем поместить свой виджет
             item = QListWidgetItem(exercises_list)
             exercises_list.addItem(item)
+            se = SportExercise(exercise_name)
+            se.tonaj_changed.connect(self.update_tonaj)
+            self.spisok.append(se)
 
-            se = SportExercise(name=exercise_name)
             item.setSizeHint(se.minimumSizeHint())  # item имеет такой же размер, что и se
+
 
             # Привязываем виджет 'спортивное упражнение' с QListWidgetItem
             exercises_list.setItemWidget(item, se)
@@ -131,7 +172,8 @@ class Window(QWidget):
         # Обший тоннаж добавляется под таблицу
         obsiy_tonaj_layout = QHBoxLayout()
         tonaj_sum_description_lbl = QLabel("Общий тоннаж:")
-        tonaj_sum_value_lbl = QLabel("0")
+        tonaj_sum_value_lbl = QLabel()
+        self.tonaj_sum_value_lbl = tonaj_sum_value_lbl
         obsiy_tonaj_layout.addWidget(tonaj_sum_description_lbl)
         obsiy_tonaj_layout.addWidget(tonaj_sum_value_lbl)
         obsiy_tonaj_layout.addItem(
@@ -141,14 +183,52 @@ class Window(QWidget):
 
         self.setLayout(mainlayout)
 
+        sbros_layout = QVBoxLayout()
+        self.sbros_button_lbl = QPushButton('Сброс')
+        sbros_layout.addWidget(self.sbros_button_lbl)
+        self.sbros_button_lbl.clicked.connect(self.reset)
+        mainlayout.addLayout(sbros_layout)
+
+    def reset(self):
+        for exercise in self.spisok:
+            exercise.reset()
+
+    def update_tonaj(self):
+        sum_tonaj = 0
+        for exercise in self.spisok:
+            sum_tonaj += exercise.get_tonaj()
+        print(f'sum = {sum_tonaj}')
+        self.tonaj_sum_value_lbl.setText(str(sum_tonaj))
+
 
 def main():
     app = QApplication(sys.argv)
-    window = Window()
+    spisok_yprahneniy = list()
+    num = 0
+    # for a in sys.argv:
+    #     print('arg', num, a)
+    #     num = num + 1
+    for el in sys.argv[1:]:
+        spisok_yprahneniy.append(el)
+    names = list()
+    if len(spisok_yprahneniy) == 0:
+        names = ["Отжимания", "Шраги", "Поднятие штанги на бицепс", 'Пресс лежа']
+    else:
+        names = spisok_yprahneniy
+    window = Window(names)
     window.resize(700, 400)
     window.show()
     sys.exit(app.exec_())
 
+def list_test(l: list):
+    s = 0
+    for i in l:
+        s = s+i
+    return s
+
 
 if __name__ == "__main__":
+    assert list_test([1, 2]) == 3
+    assert list_test([1, 3]) == 4
+    assert list_test([10, 19]) == 29
     main()
